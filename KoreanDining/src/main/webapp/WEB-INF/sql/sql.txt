@@ -1,0 +1,80 @@
+drop table kf_member;
+drop table member_address;
+drop table kf_menu;
+drop table menu_review;
+drop table question_list;
+drop table shopping_bag;
+drop table menu_order;
+drop sequence kf_menu_seq;
+drop sequence question_list_seq;
+
+
+--1.회원 테이블
+
+create table kf_member(
+	memberId	varchar2(30)	primary key,
+	memberPw	varchar2(30)	not null,
+	memberBirth	date		not null,
+	memberPhone	varchar2(30)	not null,
+	memberCode	number		default 0
+);
+
+--2.회원별 주소 테이블
+
+create table member_address(
+	memberId	varchar2(30)	constraint memberId_ad_fk references kf_member(memberId) on delete cascade,
+	memberAd	varchar2(500)	not null,
+	memberNick	varchar2(100)	not null
+);
+
+--3.메뉴 테이블
+
+create table kf_menu(
+	kfMenuNum	number		primary key,
+	kfMenuName	varchar2(300)	not null,
+	kfMenuPrice	number		not null,
+	kfMenuExplain	varchar2(500)	not null,
+	kfMenuPhotoOr	varchar2(300),
+	kfMenuPhotoSt	varchar2(300)
+);
+
+create sequence kf_menu_seq nocache;
+
+--4.메뉴별 후기 테이블
+
+create table menu_review(
+	memberId	varchar2(30)	constraint memberId_re_fk references kf_member(memberId) on delete cascade,
+	kfMenuNum	number		constraint kfMenuNum_re_fk references kf_menu(kfMenuNum) on delete cascade,
+	kfMenuStar	number		not null,
+	kfMenuReview	varchar2(500)	not null
+);
+
+--5.고객문의 테이블
+
+create table question_list(
+	listNum		number		primary key,
+	memberId	varchar2(30)	constraint memberId_qe_fk references kf_member(memberId) on delete cascade,
+	listTitle		varchar2(300)	not null,
+	listContent	varchar2(500)	not null,
+	listDate		date		not null,
+	listCheck		varchar2(30)	default 0
+);
+
+create sequence question_list_seq nocache;
+
+--6.장바구니 테이블
+
+create table shopping_bag(
+	kfMenuNum	number		constraint kfMenuNum_sh_fk references kf_menu(kfMenuNum) on delete cascade,
+	memberId	varchar2(30)	constraint memberId_sh_fk references kf_member(memberId) on delete cascade,
+	kfMenuAmount	number		default 1
+);
+
+--7 주문 테이블
+
+create table menu_order(
+	kfMenuNum	number		constraint kfMenuNum_or_fk references kf_menu(kfMenuNum) on delete cascade,
+	memberId	varchar2(30)	constraint memberId_or_fk references kf_member(memberId) on delete cascade,
+	memberAd	varchar2(500)	not null,
+	kfMenuAmount	number		not null
+);
